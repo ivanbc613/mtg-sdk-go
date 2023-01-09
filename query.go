@@ -1,8 +1,8 @@
 package mtg
 
 import (
+	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -126,18 +126,18 @@ func fetchCards(url string) ([]*Card, http.Header, error) {
 		return nil, nil, err
 	}
 
-	log.Println("Request:")
-	log.Println(url)
+	fmt.Println("Request:")
+	fmt.Println(url)
 
 	bdy := resp.Body
 	defer bdy.Close()
 
-	log.Println("Response:")
+	fmt.Println("Response:")
 	respBytes, err := ioutil.ReadAll(bdy)
 	if err != nil {
 		return nil, nil, err
 	}
-	log.Println(string(respBytes))
+	fmt.Println(string(respBytes))
 
 	if err := checkError(resp); err != nil {
 		return nil, nil, err
