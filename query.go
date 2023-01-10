@@ -103,14 +103,14 @@ type Query interface {
 	Copy() Query
 
 	// Fetches all cards matching the current query
-	All() ([]*Card, error)
+	All(debug ...bool) ([]*Card, error)
 
 	// Fetches the given page of cards.
-	Page(pageNum int) (cards []*Card, totalCardCount int, err error)
+	Page(pageNum int, debug ...bool) (cards []*Card, totalCardCount int, err error)
 	// Fetches one page of cards with a given page size
-	PageS(pageNum int, pageSize int) (cards []*Card, totalCardCount int, err error)
+	PageS(pageNum int, pageSize int, debug ...bool) (cards []*Card, totalCardCount int, err error)
 	// Fetches some random cards
-	Random(count int) ([]*Card, error)
+	Random(count int, debug ...bool) ([]*Card, error)
 }
 
 // NewQuery creates a new Query to fetch cards
@@ -120,24 +120,29 @@ func NewQuery() Query {
 
 type query map[string]string
 
-func fetchCards(url string) ([]*Card, http.Header, error) {
+func fetchCards(url string, isDebug bool) ([]*Card, http.Header, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	fmt.Println("Request:")
-	fmt.Println(url)
+	if isDebug {
+		fmt.Println("Request:")
+		fmt.Println(url)
+	}
 
 	bdy := resp.Body
 	defer bdy.Close()
 
-	fmt.Println("Response:")
 	respBytes, err := ioutil.ReadAll(bdy)
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println(string(respBytes))
+
+	if isDebug {
+		fmt.Println("Response:")
+		fmt.Println(string(respBytes))
+	}
 
 	if err := checkError(resp); err != nil {
 		return nil, nil, err
@@ -149,16 +154,19 @@ func fetchCards(url string) ([]*Card, http.Header, error) {
 	return cards, resp.Header, nil
 }
 
-func (q query) All() ([]*Card, error) {
+func (q query) All(debug ...bool) ([]*Card, error) {
 	var allCards []*Card
-
+	isDebug := false
+	if len(debug) == 1 {
+		isDebug = debug[0]
+	}
 	queryVals := make(url.Values)
 	for k, v := range q {
 		queryVals.Set(k, v)
 	}
 	nextUrl := queryUrl + "cards?" + queryVals.Encode()
 	for nextUrl != "" {
-		cards, header, err := fetchCards(nextUrl)
+		cards, header, err := fetchCards(nextUrl, isDebug)
 		if err != nil {
 			return nil, err
 		}
@@ -182,11 +190,11 @@ func (q query) All() ([]*Card, error) {
 	return allCards, nil
 }
 
-func (q query) Page(pageNum int) (cards []*Card, totalCardCount int, err error) {
-	return q.PageS(pageNum, 100)
+func (q query) Page(pageNum int, debug ...bool) (cards []*Card, totalCardCount int, err error) {
+	return q.PageS(pageNum, 100, debug...)
 }
 
-func (q query) PageS(pageNum int, pageSize int) (cards []*Card, totalCardCount int, err error) {
+func (q query) PageS(pageNum int, pageSize int, debug ...bool) (cards []*Card, totalCardCount int, err error) {
 	cards = nil
 	totalCardCount = 0
 	err = nil
@@ -196,11 +204,16 @@ func (q query) PageS(pageNum int, pageSize int) (cards []*Card, totalCardCount i
 		queryVals.Set(k, v)
 	}
 
+	isDebug := false
+	if len(debug) == 1 {
+		isDebug = debug[0]
+	}
+
 	queryVals.Set("page", strconv.Itoa(pageNum))
 	queryVals.Set("pageSize", strconv.Itoa(pageSize))
 
 	url := queryUrl + "cards?" + queryVals.Encode()
-	cards, header, err := fetchCards(url)
+	cards, header, err := fetchCards(url, isDebug)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -213,17 +226,22 @@ func (q query) PageS(pageNum int, pageSize int) (cards []*Card, totalCardCount i
 	return cards, totalCardCount, nil
 }
 
-func (q query) Random(count int) ([]*Card, error) {
+func (q query) Random(count int, debug ...bool) ([]*Card, error) {
 	queryVals := make(url.Values)
 	for k, v := range q {
 		queryVals.Set(k, v)
+	}
+
+	isDebug := false
+	if len(debug) == 1 {
+		isDebug = debug[0]
 	}
 
 	queryVals.Set("random", "true")
 	queryVals.Set("pageSize", strconv.Itoa(count))
 
 	url := queryUrl + "cards?" + queryVals.Encode()
-	cards, _, err := fetchCards(url)
+	cards, _, err := fetchCards(url, isDebug)
 	return cards, err
 }
 
