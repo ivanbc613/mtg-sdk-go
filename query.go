@@ -1,7 +1,9 @@
 package mtg
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -134,7 +136,9 @@ func fetchCards(url string, isDebug bool) ([]*Card, http.Header, error) {
 	bdy := resp.Body
 	defer bdy.Close()
 
-	respBytes, err := ioutil.ReadAll(bdy)
+	var buf bytes.Buffer
+	tee := io.TeeReader(bdy, &buf)
+	respBytes, err := ioutil.ReadAll(tee)
 	if err != nil {
 		return nil, nil, err
 	}
