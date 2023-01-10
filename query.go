@@ -140,8 +140,6 @@ func fetchCards(url string, isDebug bool) ([]*Card, http.Header, error) {
 	if isDebug {
 		fmt.Println("Decoded cards:")
 		fmt.Printf("%+v\n", cards)
-		fmt.Println("Error found:")
-		fmt.Println(err.Error())
 	}
 	if err != nil {
 		return nil, nil, err
