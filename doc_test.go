@@ -1,13 +1,12 @@
-package mtg_test
+package mtg
 
 import (
-	"github.com/MagicTheGathering/mtg-sdk-go"
 	"log"
 )
 
 func ExampleQuery_all() {
 	log.Println("Fetching all cards with CMC >= 16")
-	cards, err := mtg.NewQuery().Where(mtg.CardCMC, "gte16").All()
+	cards, err := NewQuery().Where(CardCMC, "gte16").All()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -19,7 +18,7 @@ func ExampleQuery_all() {
 func ExampleQuery_page() {
 	log.Println("fetch first page (100 cards in total)")
 
-	cards, totalCards, err := mtg.NewQuery().Where(mtg.CardColors, "green|red").Page(1)
+	cards, totalCards, err := NewQuery().Where(CardColors, "green|red").Page(1)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -33,7 +32,7 @@ func ExampleQuery_page() {
 func ExampleQuery_pageS() {
 	log.Println("Fetch Page 2 with a page size of 5")
 
-	cards, totalCards, err := mtg.NewQuery().Where(mtg.CardColors, "white").PageS(2, 5)
+	cards, totalCards, err := NewQuery().Where(CardColors, "white").PageS(2, 5)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -45,7 +44,7 @@ func ExampleQuery_pageS() {
 }
 
 func ExampleId_fetch() {
-	fetchCardID := func(cID mtg.Id) {
+	fetchCardID := func(cID Id) {
 		// cID could either be a CardId or a MultiverseId
 		card, err := cID.Fetch()
 		if err != nil {
@@ -55,15 +54,15 @@ func ExampleId_fetch() {
 	}
 
 	log.Println("Fetching one Card with a given multiverseId")
-	fetchCardID(mtg.MultiverseId(73947))
+	fetchCardID(MultiverseId(73947))
 
 	log.Println("Fetching one Card with a given cardId")
-	fetchCardID(mtg.CardId("9d91ef4896ab4c1a5611d4d06971fc8026dd2f3f"))
+	fetchCardID(CardId("9d91ef4896ab4c1a5611d4d06971fc8026dd2f3f"))
 }
 
 func ExampleQuery_random() {
 	// Fetch 2 random red rare cards
-	cards, err := mtg.NewQuery().Where(mtg.CardRarity, "rare").Where(mtg.CardColors, "red").Random(2)
+	cards, err := NewQuery().Where(CardRarity, "rare").Where(CardColors, "red").Random(2)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -73,7 +72,7 @@ func ExampleQuery_random() {
 }
 
 func ExampleSetQuery_all() {
-	sets, err := mtg.NewSetQuery().Where(mtg.SetName, "khans").All()
+	sets, err := NewSetQuery().Where(SetName, "khans").All()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -84,7 +83,7 @@ func ExampleSetQuery_all() {
 }
 
 func ExampleSetCode_fetch() {
-	set, err := mtg.SetCode("KTK").Fetch()
+	set, err := SetCode("KTK").Fetch()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -92,7 +91,7 @@ func ExampleSetCode_fetch() {
 }
 
 func ExampleSetCode_generateBooster() {
-	cards, err := mtg.SetCode("KTK").GenerateBooster()
+	cards, err := SetCode("KTK").GenerateBooster()
 	if err != nil {
 		log.Panic(err)
 	}

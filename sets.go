@@ -72,7 +72,7 @@ type setQuery map[string]string
 
 // GenerateBooster returns a slice of cards which contains cards like a booster of the given set.
 func (sc SetCode) GenerateBooster() ([]*Card, error) {
-	cards, _, err := fetchCards(fmt.Sprintf("%ssets/%s/booster", queryUrl, sc))
+	cards, _, err := fetchCards(fmt.Sprintf("%ssets/%s/booster", queryUrl, sc), false)
 	return cards, err
 }
 

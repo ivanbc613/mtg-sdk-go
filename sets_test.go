@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/jarcoal/httpmock"
 	. "github.com/smartystreets/goconvey/convey"
-	"gopkg.in/jarcoal/httpmock.v1"
 )
 
 func Test_GenerateBooster(t *testing.T) {
