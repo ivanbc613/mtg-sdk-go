@@ -1,4 +1,4 @@
-module soreca.it/mtg-sdk-go
+module github.com/ivanbc613/mtg-sdk-go
 
 go 1.19
 
